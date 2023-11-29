@@ -1,0 +1,20 @@
+name: AdventCalendarX
+version: '${project.version}'
+main: org.strassburger.adventcalendarx.AdventCalendar
+api-version: '1.20'
+authors: [Kartoffelchips]
+website: strassburger.org
+
+softdepend: [PlaceholderAPI]
+
+commands:
+  adventcalendar:
+    aliases:
+      - advent
+      - adv
+    description: open the advent calendar
+
+permissions:
+  adventcalendarx.open:
+    default: true
+    description: permission to open the advent calendar
