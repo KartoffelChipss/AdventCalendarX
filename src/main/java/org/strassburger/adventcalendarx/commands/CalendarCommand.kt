@@ -15,6 +15,8 @@ import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.SkullMeta
 import org.strassburger.adventcalendarx.AdventCalendar
 import java.lang.reflect.Field
+import java.time.ZoneId
+import java.time.ZonedDateTime
 import java.util.UUID
 import kotlin.math.log
 
@@ -25,6 +27,19 @@ class CalendarCommand() : CommandExecutor {
         val optionOne = args?.getOrNull(0)
 
         if (optionOne == null || optionOne == "open") {
+            val desiredTimeZone = ZoneId.of(AdventCalendar.instance.config.getString("timeZone") ?: "America/New_York")
+            val currentDateTime = ZonedDateTime.now(desiredTimeZone)
+            val currentMonth = currentDateTime.month
+            val currentMonthVal = currentDateTime.monthValue
+            val adventMonth = (AdventCalendar.instance.config.getString("calendarMonth") ?: "12").toIntOrNull()
+
+            //sender.sendMessage("$currentMonthVal $adventMonth")
+            if (currentMonthVal != adventMonth) {
+                val errMessage = (AdventCalendar.instance.config.getString("messages.wrongMonthMsg") ?: "<gray>You can only open the Advent Calendar in <red>%month%<gray>!").replace("%month%", currentMonth.toString())
+                sender.sendMessage(AdventCalendar.formatMsg(errMessage))
+                return false
+            }
+
             val inventory : Inventory = Bukkit.createInventory(null, 6 * 9, AdventCalendar.getAndFormatMsg(false, "inventoryname", "<dark_gray>Advent Calendar"))
 
             fillBackground(inventory)
@@ -101,6 +116,9 @@ class CalendarCommand() : CommandExecutor {
             }
 
             val head = getCustomSkull(skullTexture, skullName, skullLore)
+            val headMeta = head.itemMeta
+            headMeta.setCustomModelData(2412 + i)
+            head.itemMeta = headMeta
 
             inventory.setItem(presentSlots[i - 1], head)
             i++

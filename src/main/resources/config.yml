@@ -16,6 +16,27 @@ worlds:
   - "world_nether"
   - "world_the_end"
 
+# ========================================
+# =           Time / Timezones           =
+# ========================================
+
+# The timezone, that the calendar uses
+# A list of timezones can be found here: https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
+timeZone: "America/New_York"
+
+# The month, that the calendar should be active in
+calendarMonth: "12"
+
+# Should players be able to claim presents for previous days
+allowExpiredClaims: true
+
+# How many days after the 24th, players should be able to claim gifts
+# Only works id "allowExpiredClaims" is set to true!
+daysAfterChristmas: "3"
+
+# ========================================
+# =                 GUI                  =
+# ========================================
 
 # The name, that shows in the top of the calendar gui
 inventoryname: "<dark_gray>Advent Calendar"
@@ -31,6 +52,7 @@ fillMaterial: "GRAY_STAINED_GLASS_PANE"
 # The name format of the presents
 # Use %num% for the day number
 presentName: "<red>December %num%"
+
 # The lore of the present
 # Use %num% for the day number
 presentLore:
@@ -38,8 +60,14 @@ presentLore:
 
 # The name of the close button
 closeBtnName: "<red>Close"
+
 # The material of the close button
 closeBtnMaterial: "BARRIER"
+
+
+# =========================================
+# =          Presents / Rewards           =
+# =========================================
 
 days:
   1:
@@ -241,12 +269,26 @@ days:
       - say Merry Christmas!
       - give %player% minecraft:diamond 1
 
+
+# =========================================
+# =                Messages               =
+# =========================================
+
 # Modify all plugin messages
 messages:
   prefix: "<dark_gray>[<red>AdventCalendarX<dark_gray>]"
   usageError: "<red>Usage: %usage%"
   noPermissionError: "<red>You don't have permission to use this!"
   versionMessage: "<gray>You are using version %version%"
+  openedPresent: "<gray>You opened <red>Present %num%<gray>!"
+  wrongMonthMsg: "<gray>You can only open the Advent Calendar in <red>%month%<gray>!"
+  cannotOpenYet: "<red>You cannot open this present yet!"
+  cannotOpenExpired: "<red>You cannot open this present anymore!"
+
+
+# =========================================
+# =         Custom Skull textures         =
+# =========================================
 
 skulls:
   red: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNDUzNjhmNTYzNWZmNmMzNDA3ZjBmMzU2YzViNmUwOTQ3YmNkNWUzODQ5MGM5YWE4YjhiNTgyYTRmMjFhZTNjYiJ9fX0="
