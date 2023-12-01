@@ -14,6 +14,7 @@ import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.SkullMeta
 import org.strassburger.adventcalendarx.AdventCalendar
+import org.strassburger.adventcalendarx.util.data.ManagePlayerData
 import java.lang.reflect.Field
 import java.time.ZoneId
 import java.time.ZonedDateTime
@@ -32,10 +33,11 @@ class CalendarCommand() : CommandExecutor {
             val currentMonth = currentDateTime.month
             val currentMonthVal = currentDateTime.monthValue
             val adventMonth = (AdventCalendar.instance.config.getString("calendarMonth") ?: "12").toIntOrNull()
+            val months = listOf("January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December")
 
             //sender.sendMessage("$currentMonthVal $adventMonth")
             if (currentMonthVal != adventMonth) {
-                val errMessage = (AdventCalendar.instance.config.getString("messages.wrongMonthMsg") ?: "<gray>You can only open the Advent Calendar in <red>%month%<gray>!").replace("%month%", currentMonth.toString())
+                val errMessage = (AdventCalendar.instance.config.getString("messages.wrongMonthMsg") ?: "<gray>You can only open the Advent Calendar in <red>%month%<gray>!").replace("%month%", months[(adventMonth ?: 12) - 1])
                 sender.sendMessage(AdventCalendar.formatMsg(errMessage))
                 return false
             }
@@ -46,12 +48,44 @@ class CalendarCommand() : CommandExecutor {
 
             addCloseBtn(inventory)
 
-            addPresents(inventory)
+            addPresents(inventory, sender)
 
             sender.openInventory(inventory)
             AdventCalendar.calendarGuiMap[sender.uniqueId] = inventory
 
             return false
+        }
+
+        if (optionOne == "testmode") {
+            if (!sender.hasPermission("adventcalendarx.testmode")) {
+                sender.sendMessage(AdventCalendar.getAndFormatMsg(false, "messages.noPermissionError", "<red>You don't have permission to use this!"))
+                return false
+            }
+
+            val optionTwo = args.getOrNull(1)
+
+            var targetPlayer : Player = sender
+            if (optionTwo != null && Bukkit.getPlayer(optionTwo) != null) targetPlayer = Bukkit.getPlayer(optionTwo)!!
+
+            if (AdventCalendar.testModePlayers.contains(targetPlayer.uniqueId)) {
+                AdventCalendar.testModePlayers.remove(targetPlayer.uniqueId)
+                targetPlayer.sendMessage(AdventCalendar.getAndFormatMsg(true, "messages.leftTestmode", "<gray>You are no longer in <red>testmode<gray>!"))
+            } else {
+                AdventCalendar.testModePlayers.add(targetPlayer.uniqueId)
+                targetPlayer.sendMessage(AdventCalendar.getAndFormatMsg(true, "messages.enteredTestmode", "<gray>You are now in <red>testmode<gray>. You can now claim any present to test if the rewards work."))
+            }
+        }
+
+        if (optionOne == "reload") {
+            if (!sender.hasPermission("adventcalendarx.reload")) {
+                sender.sendMessage(AdventCalendar.getAndFormatMsg(false, "messages.noPermissionError", "<red>You don't have permission to use this!"))
+                return false
+            }
+
+            AdventCalendar.instance.reloadConfig()
+
+            Bukkit.resetRecipes()
+            sender.sendMessage(AdventCalendar.getAndFormatMsg(true, "messages.reloadMsg", "<gray>Successfully reloaded the plugin!"))
         }
 
         return false
@@ -79,8 +113,14 @@ class CalendarCommand() : CommandExecutor {
         inventory.setItem(49, btn)
     }
 
-    private fun addPresents(inventory: Inventory) {
+    private fun addPresents(inventory: Inventory, player: Player) {
         val presentSlots : List<Int> = listOf(10,11,12,13,14,15,16,19,20,21,22,23,24,25,28,29,30,31,32,33,34,39,40,41)
+
+        val claimedGifts = ManagePlayerData().getOpenedGifts(player.uniqueId)
+
+        val desiredTimeZone = ZoneId.of(AdventCalendar.instance.config.getString("timeZone") ?: "America/New_York")
+        val currentDateTime = ZonedDateTime.now(desiredTimeZone)
+        val currentDay = currentDateTime.dayOfMonth
 
         var i = 1
         while (i <= 24) {
@@ -100,6 +140,13 @@ class CalendarCommand() : CommandExecutor {
                 println("Found custom skull for present $i")
             }
 
+            val allowOpenExpiredPresents = AdventCalendar.instance.config.getBoolean("allowExpiredClaims")
+            if (currentDay > i && !allowOpenExpiredPresents) {
+                skullTexture = AdventCalendar.instance.config.getString("skulls.disabled") ?: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNWYyYjNmN2NkYjU5Mzk0YTBjODJmZTY3ZTY3Mjg0MmQ3NTVjZThlOGVkZGFlZWI5YjVjYzE3M2I1NTAxZThkNiJ9fX0="
+            }
+
+            if (claimedGifts.contains(i)) skullTexture = AdventCalendar.instance.config.getString("skulls.opened") ?: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYTQzMTAwYWJmMDFhMWZlMDVlYWY3ZTA5MDRhMGFjZDliYzMzOGIwZWU2N2I4OTBhYTY3MDUzZWU2NzJlNjY3OSJ9fX0="
+
             var skullName : Component
             val specificName = AdventCalendar.instance.config.getString("days.$i.name")
 
@@ -114,6 +161,10 @@ class CalendarCommand() : CommandExecutor {
             for (loreLine in specifiedLore) {
                 if (loreLine is String) skullLore.add(AdventCalendar.formatMsg(loreLine))
             }
+
+            if (currentDay > i && !allowOpenExpiredPresents) skullLore.add(AdventCalendar.getAndFormatMsg(false, "messages.cannotOpenExpired", "<red>You cannot open this present anymore!"))
+
+            if (claimedGifts.contains(i)) skullLore.add(AdventCalendar.getAndFormatMsg(false, "messages.alreadyOpened", "<red>You have already claimed this present!"))
 
             val head = getCustomSkull(skullTexture, skullName, skullLore)
             val headMeta = head.itemMeta

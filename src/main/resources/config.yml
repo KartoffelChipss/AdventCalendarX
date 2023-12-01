@@ -278,12 +278,16 @@ days:
 messages:
   prefix: "<dark_gray>[<red>AdventCalendarX<dark_gray>]"
   usageError: "<red>Usage: %usage%"
+  reloadMsg: "<gray>Successfully reloaded the plugin!"
   noPermissionError: "<red>You don't have permission to use this!"
   versionMessage: "<gray>You are using version %version%"
   openedPresent: "<gray>You opened <red>Present %num%<gray>!"
   wrongMonthMsg: "<gray>You can only open the Advent Calendar in <red>%month%<gray>!"
   cannotOpenYet: "<red>You cannot open this present yet!"
   cannotOpenExpired: "<red>You cannot open this present anymore!"
+  alreadyOpened: "<red>You have already claimed this present!"
+  enteredTestmode: "<gray>You are now in <red>testmode<gray>. You can now claim any present to test if the rewards work."
+  leftTestmode: "<gray>You are no longer in <red>testmode<gray>!"
 
 
 # =========================================
@@ -297,3 +301,5 @@ skulls:
   white: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZTQ3YjM3ZTY3YTg5MTU5YmY0YWNjNGE0NGQ0MzI4ZjRlZmMwMTgxNjA1MTQyMjg4ZTVlZWQxYWI4YWVkOTEzYyJ9fX0="
   purple: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZTllMzlkOTFjMDRjMzBjYzFmNTMwZmVlNzk4ZWVkMjc5ZGRlNjBmOTVjMmUxZDE1NWMwZmRkMzYxZDA5NjJlZCJ9fX0="
   yellow: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYWJkOTg3OTJkZDkyZDk3MTk4OTQzNDFhYzkwMTJhNTg0YzQ0Mjg1NThmZDJjNzEyZjc4ZTVmMGQ0ZGE4NTQ3MCJ9fX0="
+  disabled: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNWYyYjNmN2NkYjU5Mzk0YTBjODJmZTY3ZTY3Mjg0MmQ3NTVjZThlOGVkZGFlZWI5YjVjYzE3M2I1NTAxZThkNiJ9fX0="
+  opened: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYTQzMTAwYWJmMDFhMWZlMDVlYWY3ZTA5MDRhMGFjZDliYzMzOGIwZWU2N2I4OTBhYTY3MDUzZWU2NzJlNjY3OSJ9fX0="

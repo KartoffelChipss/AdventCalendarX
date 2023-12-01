@@ -18,3 +18,9 @@ permissions:
   adventcalendarx.open:
     default: true
     description: permission to open the advent calendar
+  adventcalendarx.testmode:
+    default: false
+    description: allows to test advent calendar rewards
+  adventcalendarx.reload:
+    default: false
+    description: allows to reload the plugin

@@ -8,6 +8,7 @@ import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.inventory.InventoryClickEvent
 import org.strassburger.adventcalendarx.AdventCalendar
+import org.strassburger.adventcalendarx.util.data.ManagePlayerData
 import java.time.ZoneId
 import java.time.ZonedDateTime
 
@@ -44,17 +45,18 @@ class InventoryClickListener : Listener {
                         val currentMonth = currentDateTime.month
                         val currentMonthVal = currentDateTime.monthValue
                         val currentDay = currentDateTime.dayOfMonth
+                        val months = listOf("January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December")
 
                         val adventMonth = (AdventCalendar.instance.config.getString("calendarMonth") ?: "12").toIntOrNull()
 
-                        if (currentMonthVal != adventMonth) {
-                            val errMessage = (AdventCalendar.instance.config.getString("messages.wrongMonthMsg") ?: "<gray>You can only open the Advent Calendar in <red>%month%<gray>!").replace("%month%", currentMonth.toString())
+                        if (currentMonthVal != adventMonth && !AdventCalendar.testModePlayers.contains(player.uniqueId)) {
+                            val errMessage = (AdventCalendar.instance.config.getString("messages.wrongMonthMsg") ?: "<gray>You can only open the Advent Calendar in <red>%month%<gray>!").replace("%month%", months[adventMonth ?: 12])
                             player.sendMessage(AdventCalendar.formatMsg(errMessage))
                             event.isCancelled = true
                             return
                         }
 
-                        if (currentDay < i) {
+                        if (currentDay < i && !AdventCalendar.testModePlayers.contains(player.uniqueId)) {
                             player.playSound(player.location, Sound.ENTITY_VILLAGER_NO, 400.0f, 1.0f)
                             val errMessage = (AdventCalendar.instance.config.getString("messages.cannotOpenYet") ?: "<red>You cannot open this gift yet!")
                             player.sendMessage(AdventCalendar.formatMsg(errMessage))
@@ -64,9 +66,18 @@ class InventoryClickListener : Listener {
 
                         val allowOpenExpiredPresents = AdventCalendar.instance.config.getBoolean("allowExpiredClaims")
 
-                        if (currentDay > i && !allowOpenExpiredPresents) {
+                        if (currentDay > i && !allowOpenExpiredPresents && !AdventCalendar.testModePlayers.contains(player.uniqueId)) {
                             player.playSound(player.location, Sound.ENTITY_VILLAGER_NO, 400.0f, 1.0f)
                             val errMessage = (AdventCalendar.instance.config.getString("messages.cannotOpenExpired") ?: "<red>You cannot open this present anymore!")
+                            player.sendMessage(AdventCalendar.formatMsg(errMessage))
+                            event.isCancelled = true
+                            return
+                        }
+
+                        val openedGifts = ManagePlayerData().getOpenedGifts(player.uniqueId)
+                        if (openedGifts.contains(i) && !AdventCalendar.testModePlayers.contains(player.uniqueId)) {
+                            player.playSound(player.location, Sound.ENTITY_VILLAGER_NO, 400.0f, 1.0f)
+                            val errMessage = (AdventCalendar.instance.config.getString("messages.alreadyOpened") ?: "<red>You hvae already claimed this present!")
                             player.sendMessage(AdventCalendar.formatMsg(errMessage))
                             event.isCancelled = true
                             return
@@ -80,6 +91,8 @@ class InventoryClickListener : Listener {
                                 Bukkit.dispatchCommand(console, command.replace("%player%", player.name))
                             }
                         }
+
+                        ManagePlayerData().addOpenedPresent(player.uniqueId, i)
 
                         player.playSound(player.location, Sound.ENTITY_PLAYER_LEVELUP, 400.0f, 1.0f)
                         val confirmMsg = (AdventCalendar.instance.config.getString("messages.openedPresent") ?: "<gray>You opened <red>Present %num%<gray>!").replace("%num%", i.toString())

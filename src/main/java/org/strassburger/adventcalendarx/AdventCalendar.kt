@@ -19,6 +19,8 @@ class AdventCalendar : JavaPlugin() {
         // Maps to check if a player has opened a custom gui
         val calendarGuiMap: MutableMap<UUID, Inventory> = mutableMapOf()
 
+        val testModePlayers: MutableList<UUID> = mutableListOf()
+
         fun formatMsg(msg: String): Component {
             val mm = MiniMessage.miniMessage()
             return mm.deserialize("<!i>$msg")
